@@ -10,14 +10,14 @@
   <a href="{{ product.url }}" class="block overflow-hidden rounded-lg bg-muted {{ image_ratio }}">
     {% if product.featured_image %}
       <img
-        src="{{ product.featured_image | img_url: '600x600' }}"
+        src="{{ product.featured_image.src }}"
         alt="{{ product.featured_image.alt | escape | default: product.title }}"
         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         loading="lazy"
       >
       {% if product.images[1] %}
         <img
-          src="{{ product.images[1] | img_url: '600x600' }}"
+          src="{{ product.images[1].src }}"
           alt="{{ product.images[1].alt | escape | default: product.title }}"
           class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           loading="lazy"
