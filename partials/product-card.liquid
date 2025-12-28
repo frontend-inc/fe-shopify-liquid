@@ -1,79 +1,98 @@
 {% assign show_vendor = show_vendor | default: false %}
 {% assign show_quick_add = show_quick_add | default: true %}
-{% assign image_ratio = image_ratio | default: 'aspect-square' %}
+{% assign image_ratio = image_ratio | default: 'aspect-[3/4]' %}
 
 <article
   class="group relative"
   x-data="productCard({ variantId: {{ product.variants.first.id }} })"
   data-product-id="{{ product.id }}"
 >
-  <a href="{{ product.url }}" class="block overflow-hidden rounded-lg bg-muted {{ image_ratio }}">
-    {% if product.featured_image %}
-      <img
-        src="{{ product.featured_image.src }}"
-        alt="{{ product.featured_image.alt | escape | default: product.title }}"
-        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
-      >
-      {% if product.images[1] %}
+  <div class="relative overflow-hidden rounded-2xl bg-neutral-50 shadow-sm transition-shadow duration-500 group-hover:shadow-xl">
+    <a href="{{ product.url }}" class="block {{ image_ratio }} overflow-hidden">
+      {% if product.featured_image %}
         <img
-          src="{{ product.images[1].src }}"
-          alt="{{ product.images[1].alt | escape | default: product.title }}"
-          class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          src="{{ product.featured_image.src }}"
+          alt="{{ product.featured_image.alt | escape | default: product.title }}"
+          class="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.03]"
           loading="lazy"
         >
+        {% if product.images[1] %}
+          <img
+            src="{{ product.images[1].src }}"
+            alt="{{ product.images[1].alt | escape | default: product.title }}"
+            class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 ease-out group-hover:opacity-100"
+            loading="lazy"
+          >
+        {% endif %}
+      {% else %}
+        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
+          <i class="ri-image-line text-5xl text-neutral-300"></i>
+        </div>
       {% endif %}
-    {% else %}
-      <div class="w-full h-full flex items-center justify-center">
-        <i class="ri-image-line text-4xl text-muted-foreground"></i>
+    </a>
+
+    {% if product.compare_at_price > product.price %}
+      {% assign savings = product.compare_at_price | minus: product.price %}
+      {% assign savings_percent = savings | times: 100 | divided_by: product.compare_at_price %}
+      <span class="absolute top-4 left-4 bg-black/90 text-white text-[10px] font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full backdrop-blur-sm">
+        Save {{ savings_percent }}%
+      </span>
+    {% endif %}
+
+    {% unless product.available %}
+      <span class="absolute top-4 right-4 bg-white/90 text-neutral-600 text-[10px] font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full backdrop-blur-sm border border-neutral-200">
+        Sold Out
+      </span>
+    {% endunless %}
+
+    {% if show_quick_add and product.available %}
+      <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 translate-y-2 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-y-0">
+        <button
+          class="w-full bg-white text-neutral-900 py-3 rounded-xl text-sm font-medium tracking-wide transition-all duration-300 hover:bg-neutral-100 disabled:opacity-50 flex items-center justify-center gap-2"
+          @click.prevent="addToCart"
+          :disabled="loading"
+          aria-label="Add {{ product.title }} to cart"
+        >
+          <template x-if="loading">
+            <span class="flex items-center gap-2">
+              <i class="ri-loader-4-line animate-spin"></i>
+              Adding...
+            </span>
+          </template>
+          <template x-if="added && !loading">
+            <span class="flex items-center gap-2">
+              <i class="ri-check-line"></i>
+              Added to Bag
+            </span>
+          </template>
+          <template x-if="!loading && !added">
+            <span class="flex items-center gap-2">
+              <i class="ri-shopping-bag-line"></i>
+              Add to Bag
+            </span>
+          </template>
+        </button>
       </div>
     {% endif %}
-  </a>
+  </div>
 
-  {% if product.compare_at_price > product.price %}
-    {% assign savings = product.compare_at_price | minus: product.price %}
-    {% assign savings_percent = savings | times: 100 | divided_by: product.compare_at_price %}
-    <span class="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md">
-      -{{ savings_percent }}%
-    </span>
-  {% endif %}
-
-  {% unless product.available %}
-    <span class="absolute top-2 right-2 bg-muted text-muted-foreground text-xs font-medium px-2 py-1 rounded-md">
-      Sold Out
-    </span>
-  {% endunless %}
-
-  {% if show_quick_add and product.available %}
-    <button
-      class="absolute bottom-2 right-2 bg-primary text-primary-foreground p-2 rounded-lg opacity-0 translate-y-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 hover:bg-primary/90 disabled:opacity-50"
-      @click.prevent="addToCart"
-      :disabled="loading"
-      aria-label="Add {{ product.title }} to cart"
-    >
-      <i class="ri-loader-4-line text-lg animate-spin" x-show="loading"></i>
-      <i class="ri-check-line text-lg" x-show="added && !loading"></i>
-      <i class="ri-add-line text-lg" x-show="!loading && !added"></i>
-    </button>
-  {% endif %}
-
-  <div class="mt-3 space-y-1">
+  <div class="mt-5 px-1">
     {% if show_vendor and product.vendor %}
-      <p class="text-xs text-muted-foreground uppercase tracking-wide">{{ product.vendor }}</p>
+      <p class="text-[11px] text-neutral-400 uppercase tracking-[0.2em] mb-2">{{ product.vendor }}</p>
     {% endif %}
 
-    <h3 class="text-sm font-medium">
-      <a href="{{ product.url }}" class="hover:underline">
+    <h3 class="text-base font-medium text-neutral-800 leading-snug">
+      <a href="{{ product.url }}" class="hover:text-neutral-600 transition-colors duration-300">
         {{ product.title }}
       </a>
     </h3>
 
-    <div class="flex items-center gap-2">
-      <span class="text-sm font-semibold">
+    <div class="flex items-baseline gap-3 mt-2">
+      <span class="text-base font-semibold text-neutral-900 tracking-tight">
         {{ product.price | money }}
       </span>
       {% if product.compare_at_price > product.price %}
-        <span class="text-sm text-muted-foreground line-through">
+        <span class="text-sm text-neutral-400 line-through">
           {{ product.compare_at_price | money }}
         </span>
       {% endif %}
@@ -81,16 +100,16 @@
 
     {% assign color_options = product.options_by_name['Color'].values %}
     {% if color_options.size > 1 %}
-      <div class="flex gap-1 pt-1">
+      <div class="flex items-center gap-2 mt-4">
         {% for color in color_options limit: 5 %}
           <span
-            class="w-4 h-4 rounded-full border border-border"
+            class="w-5 h-5 rounded-full ring-1 ring-neutral-200 ring-offset-2 transition-all duration-300 hover:ring-neutral-400 cursor-pointer"
             style="background-color: {{ color | handleize }};"
             title="{{ color }}"
           ></span>
         {% endfor %}
         {% if color_options.size > 5 %}
-          <span class="text-xs text-muted-foreground">+{{ color_options.size | minus: 5 }}</span>
+          <span class="text-xs text-neutral-400 ml-1">+{{ color_options.size | minus: 5 }} more</span>
         {% endif %}
       </div>
     {% endif %}
