@@ -1,13 +1,11 @@
 {% assign show_vendor = show_vendor | default: false %}
-{% assign show_quick_add = show_quick_add | default: true %}
-{% assign image_ratio = image_ratio | default: 'aspect-[3/4]' %}
+{% assign image_ratio = image_ratio | default: 'aspect-square' %}
 
 <article
   class="group relative"
-  x-data="productCard({ variantId: {{ product.variants.first.id }} })"
   data-product-id="{{ product.id }}"
 >
-  <div class="relative overflow-hidden rounded-2xl bg-neutral-50 shadow-sm transition-shadow duration-500 group-hover:shadow-xl">
+  <div class="relative overflow-hidden bg-neutral-50 shadow-sm transition-shadow duration-500 group-hover:shadow-xl">
     <a href="{{ product.url }}" class="block {{ image_ratio }} overflow-hidden">
       {% if product.featured_image %}
         <img
@@ -45,35 +43,6 @@
       </span>
     {% endunless %}
 
-    {% if show_quick_add and product.available %}
-      <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 translate-y-2 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-y-0">
-        <button
-          class="w-full bg-white text-neutral-900 py-3 rounded-xl text-sm font-medium tracking-wide transition-all duration-300 hover:bg-neutral-100 disabled:opacity-50 flex items-center justify-center gap-2"
-          @click.prevent="addToCart"
-          :disabled="loading"
-          aria-label="Add {{ product.title }} to cart"
-        >
-          <template x-if="loading">
-            <span class="flex items-center gap-2">
-              <i class="ri-loader-4-line animate-spin"></i>
-              Adding...
-            </span>
-          </template>
-          <template x-if="added && !loading">
-            <span class="flex items-center gap-2">
-              <i class="ri-check-line"></i>
-              Added to Bag
-            </span>
-          </template>
-          <template x-if="!loading && !added">
-            <span class="flex items-center gap-2">
-              <i class="ri-shopping-bag-line"></i>
-              Add to Bag
-            </span>
-          </template>
-        </button>
-      </div>
-    {% endif %}
   </div>
 
   <div class="mt-5 px-1">
