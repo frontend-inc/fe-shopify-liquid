@@ -64,7 +64,7 @@
     }
   </style>
 </head>
-<body class="m-0 p-0 font-body bg-background text-foreground">
+<body class="min-h-screen flex flex-col m-0 p-0 font-body bg-background text-foreground">
   <header class="sticky top-0 z-50 bg-background border-b border-border">
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
       <a href="/" class="text-2xl font-bold font-heading">{{ shop_name | default: 'Store' }}</a>
@@ -85,11 +85,11 @@
     </div>
   </header>
 
-  <main>
+  <main class="flex-1">
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="bg-muted border-t border-border mt-16">
+  <footer class="bg-muted border-t border-border">
     <div class="container mx-auto px-4 py-12">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
